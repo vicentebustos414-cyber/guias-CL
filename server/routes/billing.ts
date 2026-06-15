@@ -1,9 +1,9 @@
 import { Router, Request, Response } from 'express';
 import Stripe from 'stripe';
 import { query, queryOne } from '../db';
-import { requireAuth, AuthRequest, signToken } from '../middleware/auth';
+import { requireAuth, AuthRequest } from '../middleware/auth';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-05-28.basil' });
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', { apiVersion: '2024-06-20' });
 const router = Router();
 
 const PLANS = {

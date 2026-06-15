@@ -39,7 +39,7 @@
     "sql.js": "^1.10.3",
     "stripe": "^16.2.0",
     "tesseract.js": "^7.0.0",
-    "xlsx": "^0.20.3"
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
