@@ -1,116 +1,155 @@
 import { Router, Request, Response } from 'express';
-import Stripe from 'stripe';
+import express from 'express';
+import axios from 'axios';
+import crypto from 'crypto';
 import { query, queryOne } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || 'sk_test_placeholder', { apiVersion: '2024-06-20' });
 const router = Router();
 
-const PLANS = {
-  pro: {
-    name: 'Pro',
-    price_id: process.env.STRIPE_PRICE_PRO!,
-    price_clp: 9990,
-    features: ['Guías ilimitadas', 'Exportar PDF y Excel', 'Viajes ilimitados', 'Soporte por email'],
-  },
-  business: {
-    name: 'Business',
-    price_id: process.env.STRIPE_PRICE_BUSINESS!,
-    price_clp: 24990,
-    features: ['Todo de Pro', 'Múltiples usuarios (hasta 5)', 'Reportes avanzados', 'Soporte prioritario', 'Branding personalizado'],
-  },
+const FLOW_API_KEY = process.env.FLOW_API_KEY || '';
+const FLOW_SECRET_KEY = process.env.FLOW_SECRET_KEY || '';
+const APP_URL = process.env.APP_URL || 'http://localhost:5173';
+
+const PRICES: Record<string, number> = {
+  pro: 9990,
+  business: 24990,
 };
 
-// GET /api/billing/plans — public
+function signFlowRequest(data: any): string {
+  const str = FLOW_API_KEY + FLOW_SECRET_KEY + JSON.stringify(data);
+  return crypto.createHash('md5').update(str).digest('hex');
+}
+
+// GET /api/billing/plans
 router.get('/plans', (_req: Request, res: Response) => {
-  res.json(PLANS);
-});
-
-// POST /api/billing/checkout — creates Stripe checkout session
-router.post('/checkout', requireAuth, async (req: AuthRequest, res: Response) => {
-  const { plan } = req.body as { plan: 'pro' | 'business' };
-  if (!PLANS[plan]) { res.status(400).json({ error: 'Plan inválido' }); return; }
-
-  const user = await queryOne<{ email: string; stripe_customer_id: string | null }>(
-    'SELECT email, stripe_customer_id FROM users WHERE id = $1', [req.userId]
-  );
-  if (!user) { res.status(404).json({ error: 'Usuario no encontrado' }); return; }
-
-  let customerId = user.stripe_customer_id;
-  if (!customerId) {
-    const customer = await stripe.customers.create({ email: user.email, metadata: { userId: String(req.userId) } });
-    customerId = customer.id;
-    await query('UPDATE users SET stripe_customer_id = $1 WHERE id = $2', [customerId, req.userId]);
-  }
-
-  const session = await stripe.checkout.sessions.create({
-    customer: customerId,
-    payment_method_types: ['card'],
-    line_items: [{ price: PLANS[plan].price_id, quantity: 1 }],
-    mode: 'subscription',
-    success_url: `${process.env.APP_URL}/app?plan_success=1`,
-    cancel_url: `${process.env.APP_URL}/pricing`,
-    metadata: { userId: String(req.userId), plan },
+  res.json({
+    free: { name: 'Gratuito', guias: 30, price: 0 },
+    pro: { name: 'Pro', guias: Infinity, price: PRICES.pro },
+    business: { name: 'Business', guias: Infinity, price: PRICES.business },
   });
-
-  res.json({ url: session.url });
 });
 
-// POST /api/billing/portal — Stripe customer portal
-router.post('/portal', requireAuth, async (req: AuthRequest, res: Response) => {
-  const user = await queryOne<{ stripe_customer_id: string | null }>(
-    'SELECT stripe_customer_id FROM users WHERE id = $1', [req.userId]
-  );
-  if (!user?.stripe_customer_id) { res.status(400).json({ error: 'Sin suscripción activa' }); return; }
-
-  const session = await stripe.billingPortal.sessions.create({
-    customer: user.stripe_customer_id,
-    return_url: `${process.env.APP_URL}/app`,
-  });
-  res.json({ url: session.url });
-});
-
-// POST /api/billing/webhook — Stripe webhook
-router.post('/webhook', async (req: Request, res: Response) => {
-  const sig = req.headers['stripe-signature']!;
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET!);
-  } catch {
-    res.status(400).send('Webhook signature verification failed');
-    return;
-  }
-
-  if (event.type === 'checkout.session.completed') {
-    const session = event.data.object as Stripe.Checkout.Session;
-    const userId = session.metadata?.userId;
-    const plan = session.metadata?.plan;
-    if (userId && plan) {
-      await query('UPDATE users SET plan = $1, stripe_subscription_id = $2 WHERE id = $3',
-        [plan, session.subscription, userId]);
-    }
-  }
-
-  if (event.type === 'customer.subscription.deleted') {
-    const sub = event.data.object as Stripe.Subscription;
-    await query('UPDATE users SET plan = $1 WHERE stripe_subscription_id = $2', ['free', sub.id]);
-  }
-
-  res.json({ received: true });
-});
-
-// GET /api/billing/me — returns current user plan
+// GET /api/billing/me
 router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
-  const user = await queryOne<{ plan: string; guias_mes_count: number; guias_mes_reset: string; email: string }>(
-    'SELECT plan, guias_mes_count, guias_mes_reset, email FROM users WHERE id = $1', [req.userId]
-  );
-  if (!user) { res.status(404).json({ error: 'Usuario no encontrado' }); return; }
+  try {
+    const user = await queryOne<{
+      plan: string;
+      email: string;
+      guias_mes_count: number;
+      guias_mes_reset: string;
+    }>(
+      'SELECT plan, email, guias_mes_count, guias_mes_reset FROM users WHERE id = $1',
+      [req.userId]
+    );
 
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const usedThisMonth = user.guias_mes_reset === currentMonth ? user.guias_mes_count : 0;
-  const limit = user.plan === 'free' ? 10 : null;
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
 
-  res.json({ plan: user.plan, email: user.email, guias_usadas: usedThisMonth, limite_mensual: limit });
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const guiasUsadas = user.guias_mes_reset === currentMonth ? user.guias_mes_count : 0;
+    const limiteMensual = user.plan === 'free' ? 30 : null;
+
+    res.json({
+      plan: user.plan || 'free',
+      email: user.email,
+      guias_usadas: guiasUsadas,
+      limite_mensual: limiteMensual,
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: 'Error: ' + err.message });
+  }
+});
+
+// POST /api/billing/checkout
+router.post('/checkout', requireAuth, async (req: AuthRequest, res: Response) => {
+  const { plan } = req.body;
+  if (!['pro', 'business'].includes(plan)) {
+    return res.status(400).json({ error: 'Plan inválido' });
+  }
+
+  try {
+    const user = await queryOne<{ email: string }>(
+      'SELECT email FROM users WHERE id = $1',
+      [req.userId]
+    );
+
+    if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
+
+    const amount = PRICES[plan];
+    const commerceOrder = `GUIAS-${req.userId}-${Date.now()}`;
+    const returnUrl = `${APP_URL}/app`;
+    const failureUrl = `${APP_URL}/app`;
+
+    const payload = {
+      apikey: FLOW_API_KEY,
+      commerceOrder,
+      subject: `Plan ${plan.toUpperCase()} - Guías Flete Chile`,
+      amount,
+      email: user.email,
+      commerceId: FLOW_API_KEY,
+      returnUrl,
+      failureUrl,
+    };
+
+    (payload as any).s = signFlowRequest(payload);
+
+    const response = await axios.post('https://sandbox.flow.cl/api/payment/create', payload);
+
+    if (response.data?.url && response.data?.flowOrder) {
+      await query(
+        `INSERT INTO billing_orders (user_id, flow_order, plan, amount, created_at)
+         VALUES ($1, $2, $3, $4, NOW())
+         ON CONFLICT (flow_order) DO UPDATE SET created_at = NOW()`,
+        [req.userId, response.data.flowOrder, plan, amount]
+      );
+
+      res.json({ url: response.data.url });
+    } else {
+      res.status(400).json({ error: 'Flow error: ' + JSON.stringify(response.data) });
+    }
+  } catch (err: any) {
+    res.status(500).json({ error: 'Error: ' + err.message });
+  }
+});
+
+// POST /api/billing/webhook
+router.post('/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
+  try {
+    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+
+    const expectedSig = signFlowRequest(body);
+    if (body.s !== expectedSig) {
+      return res.status(400).json({ error: 'Firma inválida' });
+    }
+
+    const { status, flowOrder } = body;
+
+    if (status !== 'PAID') {
+      return res.status(200).json({ ok: true });
+    }
+
+    const order = await queryOne<{ user_id: number; plan: string }>(
+      'SELECT user_id, plan FROM billing_orders WHERE flow_order = $1',
+      [flowOrder]
+    );
+
+    if (!order) {
+      return res.status(400).json({ error: 'Orden no encontrada' });
+    }
+
+    await query('UPDATE users SET plan = $1 WHERE id = $2', [order.plan, order.user_id]);
+    await query('UPDATE billing_orders SET processed = true WHERE flow_order = $1', [flowOrder]);
+
+    res.json({ ok: true });
+  } catch (err: any) {
+    console.error('Webhook error:', err);
+    res.status(500).json({ error: 'Webhook error' });
+  }
+});
+
+// POST /api/billing/portal
+router.post('/portal', requireAuth, async (req: AuthRequest, res: Response) => {
+  res.json({ url: `${APP_URL}/app` });
 });
 
 export { router as billingRouter };

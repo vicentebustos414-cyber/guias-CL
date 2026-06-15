@@ -87,6 +87,22 @@ export async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_guias_token ON guias(share_token);
   `);
 
+  // Tabla para órdenes de Flow
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS billing_orders (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      flow_order TEXT NOT NULL UNIQUE,
+      plan TEXT NOT NULL,
+      amount INTEGER NOT NULL,
+      processed BOOLEAN NOT NULL DEFAULT false,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_billing_orders_user ON billing_orders(user_id);
+    CREATE INDEX IF NOT EXISTS idx_billing_orders_flow ON billing_orders(flow_order);
+  `);
+
   // Auto-create owner account if ADMIN_EMAIL and ADMIN_PASSWORD are set
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPass  = process.env.ADMIN_PASSWORD;
