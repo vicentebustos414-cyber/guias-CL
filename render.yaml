@@ -24,9 +24,9 @@ services:
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: APP_URL
-        sync: false
+        value: https://guias-flete-chile.onrender.com
       - key: ALLOWED_ORIGINS
-        sync: false
+        value: https://guias-flete-chile.onrender.com
 
 databases:
   - name: guias-flete-db
