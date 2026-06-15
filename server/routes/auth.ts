@@ -5,7 +5,7 @@ import { signToken } from '../middleware/auth';
 
 const router = Router();
 
-const PLAN_LIMITS = { free: 10, pro: Infinity, business: Infinity };
+const PLAN_LIMITS = { free: 30, pro: Infinity, business: Infinity };
 
 router.post('/register', async (req: Request, res: Response) => {
   const { email, password, empresa_nombre } = req.body;

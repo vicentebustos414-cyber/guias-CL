@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Save, Printer, ArrowLeft, Plus, Trash2, ChevronDown, Sparkles, FileSpreadsheet, AlertCircle } from 'lucide-react';
 import type { Page } from '../App';
 import type { Guia, CargoExtra } from '../../shared/types';
-import { formatCLP, hoy, formatRut } from '../lib/format';
+import { formatCLP, hoy, formatRut, validarRut } from '../lib/format';
 import { generatePDF } from '../lib/pdf';
 import { exportarGuiaExcel } from '../lib/excel';
 import ImportModal from '../components/ImportModal';
@@ -77,6 +77,8 @@ export default function GuiaFormPage({ editId, onNavigate }: Props) {
     if (!form.fecha)               e.fecha       = 'Requerido';
     if (!form.origen.trim())       e.origen      = 'Requerido';
     if (!form.destino.trim())      e.destino     = 'Requerido';
+    if (form.rut_empresa && !validarRut(form.rut_empresa))   e.rut_empresa = 'RUT inválido';
+    if (form.rut_chofer  && !validarRut(form.rut_chofer))    e.rut_chofer  = 'RUT inválido';
     setErrors(e);
     if (Object.keys(e).length > 0) {
       const campos = Object.keys(e).map(k => ({
@@ -323,9 +325,12 @@ export default function GuiaFormPage({ editId, onNavigate }: Props) {
             </div>
             <div>
               <label className="label">RUT Empresa</label>
-              <input className="input-field" value={form.rut_empresa}
+              <input className={`input-field ${errors.rut_empresa ? 'border-red-400' : form.rut_empresa && validarRut(form.rut_empresa) ? 'border-emerald-400' : ''}`}
+                value={form.rut_empresa}
                 onChange={e => set('rut_empresa', formatRut(e.target.value))}
                 placeholder="12.345.678-9" maxLength={12} />
+              {errors.rut_empresa && <p className="text-red-500 text-xs mt-1">{errors.rut_empresa}</p>}
+              {!errors.rut_empresa && form.rut_empresa && validarRut(form.rut_empresa) && <p className="text-emerald-600 text-xs mt-1">✓ RUT válido</p>}
             </div>
           </div>
         </div>
@@ -344,9 +349,12 @@ export default function GuiaFormPage({ editId, onNavigate }: Props) {
             </div>
             <div>
               <label className="label">RUT Chofer</label>
-              <input className="input-field" value={form.rut_chofer}
+              <input className={`input-field ${errors.rut_chofer ? 'border-red-400' : form.rut_chofer && validarRut(form.rut_chofer) ? 'border-emerald-400' : ''}`}
+                value={form.rut_chofer}
                 onChange={e => set('rut_chofer', formatRut(e.target.value))}
                 placeholder="12.345.678-9" maxLength={12} />
+              {errors.rut_chofer && <p className="text-red-500 text-xs mt-1">{errors.rut_chofer}</p>}
+              {!errors.rut_chofer && form.rut_chofer && validarRut(form.rut_chofer) && <p className="text-emerald-600 text-xs mt-1">✓ RUT válido</p>}
             </div>
             <div>
               <label className="label">Patente Vehículo</label>
