@@ -293,24 +293,40 @@ export default function ImportModal({ onImport, onBatchImport, onClose }: Props)
     const url = URL.createObjectURL(file);
     setPreview(url);
 
+    const IS_WEB = !(window as any).api;
+
     try {
       // Paso 1: preprocesado avanzado
       const processed = await preprocessImageForOCR(file);
       setProgress(12);
 
-      // Paso 2: OCR única pasada PSM 6 (tabla uniforme — mejor para Excel)
-      const worker = await createWorker('spa', 1, {
+      // Paso 2: OCR — en web usamos CDN para que el worker/WASM cargue correctamente
+      const workerOptions: Record<string, any> = {
         logger: (m: any) => {
           if (m.status === 'recognizing text')
             setProgress(12 + Math.round(m.progress * 80));
         },
+      };
+
+      if (IS_WEB) {
+        // En el navegador, tesseract.js no puede resolver las rutas locales de node_modules.
+        // Cargamos worker, core y lang data desde CDN pública.
+        workerOptions.workerPath = 'https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/worker.min.js';
+        workerOptions.corePath   = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@6/tesseract-core-simd.wasm.js';
+        workerOptions.langPath   = 'https://tessdata.projectnaptha.com/4.0.0';
+      }
+
+      const worker = await createWorker('spa', 1, workerOptions);
+
+      // setParameters: PSM 6 = tabla uniforme (mejor para planillas Excel)
+      await worker.setParameters({
+        tessedit_pageseg_mode: '6' as any,
+        preserve_interword_spaces: '1' as any,
+        tessedit_do_invert: '0' as any,
       });
-      await (worker as any).setParameters({
-        tessedit_pageseg_mode: '6',
-        preserve_interword_spaces: '1',
-        tessedit_do_invert: '0',
-      });
-      const { data } = await worker.recognize(processed as File);
+
+      // processed es Blob (no File), pero tesseract.js acepta Blob directamente
+      const { data } = await worker.recognize(processed);
       await worker.terminate();
 
       // Paso 3: corrección post-OCR
@@ -321,7 +337,7 @@ export default function ImportModal({ onImport, onBatchImport, onClose }: Props)
       detectAndSet(cleaned);
 
     } catch (err: any) {
-      setError('Error al procesar la imagen: ' + (err.message || err));
+      setError('Error al procesar la imagen: ' + (err.message || String(err)));
     } finally {
       setLoading(false);
     }

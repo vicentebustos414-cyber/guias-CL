@@ -9,9 +9,17 @@ export default defineConfig({
   build: {
     outDir: '../../dist',
     emptyOutDir: true,
+    rollupOptions: {
+      // tesseract.js usa workers dinámicos; excluirlo del bundle evita que Vite
+      // rompa sus referencias internas a WASM y worker scripts
+      external: [],
+    },
   },
   resolve: {
     alias: { '@': path.resolve(__dirname, 'src/renderer') },
+  },
+  optimizeDeps: {
+    exclude: ['tesseract.js'],
   },
   server: { port: 5173 },
 });

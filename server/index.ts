@@ -19,11 +19,22 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'wasm-unsafe-eval'",
+        'https://cdn.jsdelivr.net',
+        'https://unpkg.com',
+      ],
       styleSrc: ["'self'", "'unsafe-inline'"],
       imgSrc: ["'self'", 'data:', 'blob:'],
-      connectSrc: ["'self'"],
+      connectSrc: [
+        "'self'",
+        'https://cdn.jsdelivr.net',
+        'https://unpkg.com',
+        'https://tessdata.projectnaptha.com',
+      ],
       fontSrc: ["'self'", 'data:'],
+      workerSrc: ["'self'", 'blob:', 'https://cdn.jsdelivr.net', 'https://unpkg.com'],
     },
   },
 }));
