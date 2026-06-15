@@ -1,7 +1,7 @@
 services:
   - type: web
     name: guias-flete-chile
-    env: node
+    runtime: node
     plan: starter
     buildCommand: npm install && npm run build:web && npm run build:server
     startCommand: node dist-server/index.js
