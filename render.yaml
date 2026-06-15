@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: guias-flete-chile
+    env: node
+    plan: starter
+    buildCommand: npm install && npm run build:web && npm run build:server
+    startCommand: node dist-server/index.js
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: guias-flete-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PRICE_PRO
+        sync: false
+      - key: STRIPE_PRICE_BUSINESS
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: APP_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+
+databases:
+  - name: guias-flete-db
+    plan: starter
+    databaseName: guias_flete
+    user: guias_admin
