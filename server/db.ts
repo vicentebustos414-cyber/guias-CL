@@ -81,6 +81,24 @@ export async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_viajes_user ON viajes(user_id);
   `);
 
+  // Auto-create owner account if ADMIN_EMAIL and ADMIN_PASSWORD are set
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPass  = process.env.ADMIN_PASSWORD;
+  if (adminEmail && adminPass) {
+    const bcrypt = require('bcryptjs');
+    const existing = await pool.query('SELECT id FROM users WHERE email = $1', [adminEmail]);
+    if (existing.rows.length === 0) {
+      const hash = await bcrypt.hash(adminPass, 12);
+      const res = await pool.query(
+        `INSERT INTO users (email, password_hash, empresa_nombre, plan)
+         VALUES ($1, $2, $3, 'business') RETURNING id`,
+        [adminEmail, hash, 'Propietario']
+      );
+      await pool.query('INSERT INTO config (user_id) VALUES ($1) ON CONFLICT DO NOTHING', [res.rows[0].id]);
+      console.log('Owner account created:', adminEmail);
+    }
+  }
+
   console.log('Database initialized');
 }
 
