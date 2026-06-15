@@ -5,20 +5,22 @@ import GuiaFormPage from './pages/GuiaFormPage';
 import HistorialPage from './pages/HistorialPage';
 import ViajesPage from './pages/ViajesPage';
 import ConfigPage from './pages/ConfigPage';
+import ReportesPage from './pages/ReportesPage';
 import LoginPage from './pages/LoginPage';
 import PricingPage from './pages/PricingPage';
 import LandingPage from './pages/LandingPage';
+import PortalPage from './pages/PortalPage';
 
-export type Page = 'dashboard' | 'nueva-guia' | 'historial' | 'viajes' | 'config';
+export type Page = 'dashboard' | 'nueva-guia' | 'historial' | 'viajes' | 'config' | 'reportes';
 
 const IS_WEB = !(window as any).api;
 
-function getInitialRoute(): 'landing' | 'login' | 'pricing' | 'app' {
+function getInitialRoute(): 'landing' | 'login' | 'pricing' | 'app' | 'portal' {
   const path = window.location.pathname;
+  if (path.startsWith('/guia/')) return 'portal';
   if (path === '/pricing') return 'pricing';
   if (path === '/login')   return 'login';
   if (path === '/app')     return 'app';
-  // Root '/' → landing si es web sin sesión
   if (IS_WEB && !localStorage.getItem('jwt_token')) return 'landing';
   return 'app';
 }
@@ -26,7 +28,7 @@ function getInitialRoute(): 'landing' | 'login' | 'pricing' | 'app' {
 export default function App() {
   const [page, setPage] = useState<Page>('dashboard');
   const [editId, setEditId] = useState<number | null>(null);
-  const [route, setRoute] = useState<'landing' | 'login' | 'pricing' | 'app'>(getInitialRoute);
+  const [route, setRoute] = useState<'landing' | 'login' | 'pricing' | 'app' | 'portal'>(getInitialRoute);
 
   useEffect(() => {
     if (IS_WEB && route === 'app' && !localStorage.getItem('jwt_token')) {
@@ -43,6 +45,8 @@ export default function App() {
     setRoute(r);
     if (path) window.history.pushState({}, '', path);
   }
+
+  if (route === 'portal') return <PortalPage />;
 
   if (IS_WEB && route === 'landing') {
     return (
@@ -82,6 +86,7 @@ export default function App() {
         {page === 'nueva-guia' && <GuiaFormPage editId={editId} onNavigate={navigate} />}
         {page === 'historial'  && <HistorialPage onNavigate={navigate} />}
         {page === 'viajes'     && <ViajesPage />}
+        {page === 'reportes'   && <ReportesPage />}
         {page === 'config'     && <ConfigPage />}
       </main>
     </div>

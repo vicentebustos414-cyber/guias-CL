@@ -1,5 +1,5 @@
 import React from 'react';
-import { LayoutDashboard, FilePlus2, ClipboardList, Settings, Truck, Route, LogOut, Zap } from 'lucide-react';
+import { LayoutDashboard, FilePlus2, ClipboardList, Settings, Truck, Route, LogOut, Zap, BarChart2 } from 'lucide-react';
 import type { Page } from '../App';
 
 interface Props {
@@ -15,6 +15,7 @@ const items = [
   { id: 'nueva-guia' as Page,  label: 'Nueva Guía',    icon: FilePlus2 },
   { id: 'historial' as Page,   label: 'Historial',     icon: ClipboardList },
   { id: 'viajes' as Page,      label: 'Mis Viajes',    icon: Route },
+  { id: 'reportes' as Page,    label: 'Reportes',      icon: BarChart2 },
   { id: 'config' as Page,      label: 'Configuración', icon: Settings },
 ];
 

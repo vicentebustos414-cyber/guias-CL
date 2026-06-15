@@ -41,6 +41,7 @@ export const webApi = {
     update: (guia: Guia) => request<Guia>('PUT', `/guias/${guia.id}`, guia),
     delete: (id: number) => request<{ ok: boolean }>('DELETE', `/guias/${id}`),
     nextNumero: () => request<{ numero: string }>('GET', '/guias/meta/next-numero').then(r => r.numero),
+    share: (id: number) => request<{ token: string; url: string }>('POST', `/guias/${id}/share`),
     exportPath: (numeroGuia: string) => Promise.resolve(`Guia_${numeroGuia}.pdf`),
     savePdf: async (buf: number[], fileName: string): Promise<boolean> => {
       const blob = new Blob([new Uint8Array(buf)], { type: 'application/pdf' });

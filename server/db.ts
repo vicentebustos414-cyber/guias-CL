@@ -81,6 +81,12 @@ export async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_viajes_user ON viajes(user_id);
   `);
 
+  // Migrations: add share_token column if not exists
+  await pool.query(`
+    ALTER TABLE guias ADD COLUMN IF NOT EXISTS share_token TEXT UNIQUE;
+    CREATE INDEX IF NOT EXISTS idx_guias_token ON guias(share_token);
+  `);
+
   // Auto-create owner account if ADMIN_EMAIL and ADMIN_PASSWORD are set
   const adminEmail = process.env.ADMIN_EMAIL;
   const adminPass  = process.env.ADMIN_PASSWORD;

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   Search, FilePlus2, Edit2, Trash2, Printer, FileSpreadsheet,
   Receipt, X, AlertTriangle, CheckSquare, Square, CheckCircle2,
-  RotateCcw,
+  RotateCcw, Share2,
 } from 'lucide-react';
 import type { Page } from '../App';
 import type { Guia } from '../../shared/types';
@@ -497,6 +497,29 @@ export default function HistorialPage({ onNavigate }: Props) {
     if (filePath) await api.guias.savePdf(Array.from(pdfBytes), filePath);
   }
 
+  // ── Compartir por WhatsApp ───────────────────────────────────────────────────
+  async function handleShare(g: Guia) {
+    let portalUrl = '';
+    try {
+      if (api.guias.share) {
+        const result = await api.guias.share(g.id!);
+        portalUrl = result.url;
+      }
+    } catch { /* sin portal */ }
+
+    const texto = [
+      `Hola, le compartimos la guía de flete N° ${g.numero_guia}.`,
+      `Empresa: ${g.empresa_flete}`,
+      `Tramo: ${g.origen} → ${g.destino}`,
+      `Fecha: ${formatFecha(g.fecha)}`,
+      `Total: ${formatCLP(g.monto_total)}`,
+      portalUrl ? `\nVer / descargar: ${portalUrl}` : '',
+    ].filter(Boolean).join('\n');
+
+    const waUrl = `https://wa.me/?text=${encodeURIComponent(texto)}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  }
+
   // ── Nota de Crédito ──────────────────────────────────────────────────────────
   async function handleGenerarNotaCredito(
     receptor: ReceptorFactura,
@@ -754,6 +777,13 @@ export default function HistorialPage({ onNavigate }: Props) {
                             onClick={e => { e.stopPropagation(); setSelected(new Set([g.id!])); setShowFactura(true); }}
                           >
                             <Receipt className="w-4 h-4" />
+                          </button>
+                          <button
+                            title="Compartir por WhatsApp"
+                            className="p-2 hover:bg-green-50 rounded-lg text-slate-400 hover:text-green-600 transition-colors"
+                            onClick={e => { e.stopPropagation(); handleShare(g); }}
+                          >
+                            <Share2 className="w-4 h-4" />
                           </button>
                           <button
                             title="Eliminar guía"

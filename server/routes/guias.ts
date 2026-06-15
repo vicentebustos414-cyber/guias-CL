@@ -1,4 +1,5 @@
 import { Router, Response } from 'express';
+import { randomBytes } from 'crypto';
 import { query, queryOne } from '../db';
 import { requireAuth, AuthRequest } from '../middleware/auth';
 import { PLAN_LIMITS } from './auth';
@@ -59,14 +60,15 @@ router.post('/', async (req: AuthRequest, res: Response) => {
   }
 
   const g = req.body;
+  const shareToken = randomBytes(24).toString('hex');
   const [row] = await query(
     `INSERT INTO guias (user_id,numero_guia,fecha,origen,destino,empresa_flete,rut_empresa,
-      nombre_chofer,rut_chofer,patente,descripcion_carga,monto_base,cargos_extra,monto_total,estado,notas)
-     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) RETURNING *`,
+      nombre_chofer,rut_chofer,patente,descripcion_carga,monto_base,cargos_extra,monto_total,estado,notas,share_token)
+     VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) RETURNING *`,
     [req.userId, g.numero_guia, g.fecha, g.origen, g.destino, g.empresa_flete,
      g.rut_empresa || '', g.nombre_chofer || '', g.rut_chofer || '', g.patente || '',
      g.descripcion_carga || '', g.monto_base || 0, JSON.stringify(g.cargos_extra || []),
-     g.monto_total || 0, g.estado || 'pendiente', g.notas || '']
+     g.monto_total || 0, g.estado || 'pendiente', g.notas || '', shareToken]
   );
 
   // Update ultimo_numero in config
@@ -105,6 +107,20 @@ router.delete('/:id', async (req: AuthRequest, res: Response) => {
   const result = await query('DELETE FROM guias WHERE id = $1 AND user_id = $2 RETURNING id', [req.params.id, req.userId]);
   if (!result.length) { res.status(404).json({ error: 'No encontrado' }); return; }
   res.json({ ok: true });
+});
+
+// POST /api/guias/:id/share — genera o renueva el share_token
+router.post('/:id/share', async (req: AuthRequest, res: Response) => {
+  const existing = await queryOne<{ share_token: string }>(
+    'SELECT share_token FROM guias WHERE id = $1 AND user_id = $2', [req.params.id, req.userId]
+  );
+  if (!existing) { res.status(404).json({ error: 'No encontrado' }); return; }
+  const token = existing.share_token ?? randomBytes(24).toString('hex');
+  if (!existing.share_token) {
+    await query('UPDATE guias SET share_token = $1 WHERE id = $2 AND user_id = $3', [token, req.params.id, req.userId]);
+  }
+  const appUrl = process.env.APP_URL ?? 'http://localhost:5173';
+  res.json({ token, url: `${appUrl}/guia/${token}` });
 });
 
 // GET /api/guias/next-numero

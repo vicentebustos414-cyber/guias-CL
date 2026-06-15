@@ -9,6 +9,7 @@ import { guiasRouter } from './routes/guias';
 import { viajesRouter } from './routes/viajes';
 import { configRouter } from './routes/config';
 import { billingRouter } from './routes/billing';
+import { portalRouter } from './routes/portal';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -50,6 +51,7 @@ app.use('/api/guias', guiasRouter);
 app.use('/api/viajes', viajesRouter);
 app.use('/api/config', configRouter);
 app.use('/api/billing', billingRouter);
+app.use('/api/portal', portalRouter);
 
 app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date().toISOString() }));
 
