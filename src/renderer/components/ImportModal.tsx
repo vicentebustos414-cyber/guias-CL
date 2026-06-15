@@ -301,20 +301,20 @@ export default function ImportModal({ onImport, onBatchImport, onClose }: Props)
       setProgress(12);
 
       // Paso 2: OCR — en web usamos CDN para que el worker/WASM cargue correctamente
+      // Siempre usamos CDN explícita para el worker, core y lang data.
+      // En web: Vite no expone node_modules como archivos estáticos.
+      // En Electron: tesseract.js igualmente intenta CDN por defecto (su workerPath
+      // apunta a jsdelivr), pero la CSP bloqueaba URLs no declaradas explícitamente.
+      // Al declarar las rutas aquí usamos la versión fija @7 / core@6.
       const workerOptions: Record<string, any> = {
+        workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/worker.min.js',
+        corePath:   'https://cdn.jsdelivr.net/npm/tesseract.js-core@6/tesseract-core-simd.wasm.js',
+        langPath:   'https://tessdata.projectnaptha.com/4.0.0',
         logger: (m: any) => {
           if (m.status === 'recognizing text')
             setProgress(12 + Math.round(m.progress * 80));
         },
       };
-
-      if (IS_WEB) {
-        // En el navegador, tesseract.js no puede resolver las rutas locales de node_modules.
-        // Cargamos worker, core y lang data desde CDN pública.
-        workerOptions.workerPath = 'https://cdn.jsdelivr.net/npm/tesseract.js@7/dist/worker.min.js';
-        workerOptions.corePath   = 'https://cdn.jsdelivr.net/npm/tesseract.js-core@6/tesseract-core-simd.wasm.js';
-        workerOptions.langPath   = 'https://tessdata.projectnaptha.com/4.0.0';
-      }
 
       const worker = await createWorker('spa', 1, workerOptions);
 
