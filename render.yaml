@@ -2,7 +2,7 @@ services:
   - type: web
     name: guias-flete-chile
     runtime: node
-    plan: starter
+    plan: free
     buildCommand: npm install && npm run build:web && npm run build:server
     startCommand: node dist-server/index.js
     healthCheckPath: /api/health
@@ -30,6 +30,6 @@ services:
 
 databases:
   - name: guias-flete-db
-    plan: starter
+    plan: free
     databaseName: guias_flete
     user: guias_admin
