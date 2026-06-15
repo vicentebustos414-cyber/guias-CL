@@ -3,7 +3,7 @@ services:
     name: guias-flete-chile
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build:web && npm run build:server
+    buildCommand: npm install --include=dev && npm run build:web && npm run build:server
     startCommand: node dist-server/index.js
     healthCheckPath: /api/health
     envVars:
