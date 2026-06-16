@@ -81,10 +81,13 @@ export async function initDb() {
     CREATE INDEX IF NOT EXISTS idx_viajes_user ON viajes(user_id);
   `);
 
-  // Migrations: add share_token column if not exists
+  // Migrations
   await pool.query(`
     ALTER TABLE guias ADD COLUMN IF NOT EXISTS share_token TEXT UNIQUE;
     CREATE INDEX IF NOT EXISTS idx_guias_token ON guias(share_token);
+  `);
+  await pool.query(`
+    ALTER TABLE config ADD COLUMN IF NOT EXISTS firma_imagen TEXT;
   `);
 
   // Tabla para órdenes de Flow

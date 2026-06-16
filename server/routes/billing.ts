@@ -7,18 +7,22 @@ import { requireAuth, AuthRequest } from '../middleware/auth';
 
 const router = Router();
 
-const FLOW_API_KEY = process.env.FLOW_API_KEY || '';
+const FLOW_API_KEY   = process.env.FLOW_API_KEY   || '';
 const FLOW_SECRET_KEY = process.env.FLOW_SECRET_KEY || '';
-const APP_URL = process.env.APP_URL || 'http://localhost:5173';
+const APP_URL         = process.env.APP_URL         || 'http://localhost:5173';
+const FLOW_BASE       = process.env.FLOW_ENV === 'production'
+  ? 'https://www.flow.cl/api'
+  : 'https://sandbox.flow.cl/api';
 
 const PRICES: Record<string, number> = {
   pro: 9990,
   business: 24990,
 };
 
-function signFlowRequest(data: any): string {
-  const str = FLOW_API_KEY + FLOW_SECRET_KEY + JSON.stringify(data);
-  return crypto.createHash('md5').update(str).digest('hex');
+// Flow firma: parámetros ordenados alfabéticamente, concatenados key+value, HMAC-SHA256
+function signFlowRequest(params: Record<string, string | number>): string {
+  const msg = Object.keys(params).sort().reduce((acc, key) => acc + key + params[key], '');
+  return crypto.createHmac('sha256', FLOW_SECRET_KEY).update(msg).digest('hex');
 }
 
 // GET /api/billing/plans
@@ -80,20 +84,19 @@ router.post('/checkout', requireAuth, async (req: AuthRequest, res: Response) =>
     const returnUrl = `${APP_URL}/app`;
     const failureUrl = `${APP_URL}/app`;
 
-    const payload = {
+    const payloadToSign: Record<string, string | number> = {
       apikey: FLOW_API_KEY,
       commerceOrder,
       subject: `Plan ${plan.toUpperCase()} - Guías Flete Chile`,
       amount,
       email: user.email,
-      commerceId: FLOW_API_KEY,
-      returnUrl,
-      failureUrl,
+      urlReturn: returnUrl,
+      urlConfirmation: `${APP_URL}/api/billing/webhook`,
     };
 
-    (payload as any).s = signFlowRequest(payload);
+    const payload = { ...payloadToSign, s: signFlowRequest(payloadToSign) };
 
-    const response = await axios.post('https://sandbox.flow.cl/api/payment/create', payload);
+    const response = await axios.post(`${FLOW_BASE}/payment/create`, payload);
 
     if (response.data?.url && response.data?.flowOrder) {
       await query(
@@ -112,13 +115,16 @@ router.post('/checkout', requireAuth, async (req: AuthRequest, res: Response) =>
   }
 });
 
-// POST /api/billing/webhook
-router.post('/webhook', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
+// POST /api/billing/webhook — Flow envía urlencoded form, no JSON
+router.post('/webhook', express.urlencoded({ extended: false }), async (req: Request, res: Response) => {
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    const body: Record<string, string> = req.body;
 
-    const expectedSig = signFlowRequest(body);
-    if (body.s !== expectedSig) {
+    // Verificar firma: excluir 's' del payload antes de recalcular
+    const { s: receivedSig, ...rest } = body;
+    const expectedSig = signFlowRequest(rest as Record<string, string | number>);
+    if (receivedSig !== expectedSig) {
+      console.error('Flow webhook firma inválida', { received: receivedSig, expected: expectedSig });
       return res.status(400).json({ error: 'Firma inválida' });
     }
 

@@ -147,13 +147,15 @@ export function registerIpcHandlers() {
       empresa_emisora: JSON.parse(row?.empresa_emisora || '{}'),
       prefijo_guia: row?.prefijo_guia ?? 'G',
       ultimo_numero: row?.ultimo_numero ?? 0,
+      firma_imagen: row?.firma_imagen ?? null,
     };
   });
 
   ipcMain.handle('config:save', (_e, config: AppConfig) => {
-    run('UPDATE config SET empresa_emisora=:e, prefijo_guia=:p WHERE id=1', {
+    run('UPDATE config SET empresa_emisora=:e, prefijo_guia=:p, firma_imagen=:f WHERE id=1', {
       ':e': JSON.stringify(config.empresa_emisora),
       ':p': config.prefijo_guia,
+      ':f': config.firma_imagen ?? null,
     });
     return true;
   });

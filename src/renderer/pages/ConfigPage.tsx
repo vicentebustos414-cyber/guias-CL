@@ -1,28 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { Save, Building2, Hash } from 'lucide-react';
+import { Save, Building2, Hash, PenLine } from 'lucide-react';
 import type { AppConfig, Empresa } from '../../shared/types';
 import { formatRut } from '../lib/format';
+import FirmaCanvas from '../components/FirmaCanvas';
 
 const EMPTY_EMPRESA: Empresa = { nombre: '', rut: '', direccion: '', telefono: '', email: '', giro: '' };
 
 export default function ConfigPage() {
   const api = (window as any).api;
-  const [empresa, setEmpresa] = useState<Empresa>(EMPTY_EMPRESA);
-  const [prefijo, setPrefijo] = useState('G');
-  const [saved, setSaved] = useState(false);
+  const [empresa, setEmpresa]   = useState<Empresa>(EMPTY_EMPRESA);
+  const [prefijo, setPrefijo]   = useState('G');
+  const [firma, setFirma]       = useState<string | null>(null);
+  const [saved, setSaved]       = useState(false);
 
   useEffect(() => {
     if (!api) return;
     api.config.get().then((c: AppConfig) => {
       setEmpresa(c.empresa_emisora || EMPTY_EMPRESA);
       setPrefijo(c.prefijo_guia || 'G');
+      setFirma(c.firma_imagen ?? null);
     });
   }, []);
 
   async function handleSave() {
     if (!api) return;
     const current = await api.config.get();
-    await api.config.save({ empresa_emisora: empresa, prefijo_guia: prefijo, ultimo_numero: current.ultimo_numero });
+    await api.config.save({
+      empresa_emisora: empresa,
+      prefijo_guia: prefijo,
+      ultimo_numero: current.ultimo_numero,
+      firma_imagen: firma,
+    });
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
   }
@@ -75,6 +83,17 @@ export default function ConfigPage() {
               onChange={e => setE('email', e.target.value)} placeholder="contacto@empresa.cl" />
           </div>
         </div>
+      </div>
+
+      {/* Firma visual */}
+      <div className="card p-5 mb-4">
+        <h2 className="font-semibold text-slate-700 mb-1 flex items-center gap-2">
+          <PenLine className="w-4 h-4 text-blue-600" /> Firma del Emisor
+        </h2>
+        <p className="text-xs text-slate-400 mb-4">
+          Se estampará automáticamente en la sección "Firma Emisor" de tus guías de flete
+        </p>
+        <FirmaCanvas value={firma} onChange={setFirma} />
       </div>
 
       {/* Numeración */}

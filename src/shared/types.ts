@@ -54,4 +54,5 @@ export interface AppConfig {
   empresa_emisora: Empresa;
   prefijo_guia: string;
   ultimo_numero: number;
+  firma_imagen?: string; // base64 PNG de la firma visual del emisor
 }

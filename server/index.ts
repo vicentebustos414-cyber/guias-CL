@@ -68,13 +68,32 @@ app.get('/api/health', (_req, res) => res.json({ status: 'ok', ts: new Date().to
 
 // Serve frontend in production
 if (process.env.NODE_ENV === 'production') {
-  const distPath = path.join(__dirname, '..', 'dist');
+  const distPath    = path.join(__dirname, '..', 'dist');
+  const landingPath = path.join(__dirname, '..', 'landing');
+
+  // Landing page estática en raíz — más rápida y con mejor SEO que el SPA
+  app.use('/landing', express.static(landingPath));
+  app.get('/', (_req, res) => res.sendFile(path.join(landingPath, 'index.html')));
+
+  // React SPA para todo lo demás
   app.use(express.static(distPath));
   app.get('*', (_req, res) => res.sendFile(path.join(distPath, 'index.html')));
 }
 
 initDb().then(() => {
-  app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+
+    // Auto-ping para evitar que Render Free duerma (cada 14 minutos)
+    if (process.env.NODE_ENV === 'production' && process.env.APP_URL) {
+      const PING_INTERVAL = 14 * 60 * 1000;
+      setInterval(async () => {
+        try {
+          await fetch(`${process.env.APP_URL}/api/health`);
+        } catch { /* ignorar si falla, UptimeRobot es el respaldo */ }
+      }, PING_INTERVAL);
+    }
+  });
 }).catch(err => {
   console.error('Failed to initialize database:', err);
   process.exit(1);

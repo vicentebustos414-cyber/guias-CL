@@ -452,7 +452,7 @@ export async function generateNotaCredito(
   return new Uint8Array(doc.output('arraybuffer') as ArrayBuffer);
 }
 
-export async function generatePDF(guia: Guia, emisor: Empresa): Promise<Uint8Array> {
+export async function generatePDF(guia: Guia, emisor: Empresa, firmaImagen?: string | null): Promise<Uint8Array> {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'letter' });
   const W = doc.internal.pageSize.getWidth();
   const marginL = 15;
@@ -614,12 +614,19 @@ export async function generatePDF(guia: Guia, emisor: Empresa): Promise<Uint8Arr
   }
 
   // ── Firmas ───────────────────────────────────────────────────────────────────
-  y = Math.max(y, doc.internal.pageSize.getHeight() - 40);
+  y = Math.max(y, doc.internal.pageSize.getHeight() - 44);
   doc.setDrawColor(200, 200, 200);
 
   const fw = 55;
   const fc = [marginL + fw / 2, W / 2, W - marginR - fw / 2];
   const labels = ['Firma Emisor', 'Firma Receptor', 'Firma Conductor'];
+
+  // Incrustar firma del emisor si existe
+  if (firmaImagen) {
+    try {
+      doc.addImage(firmaImagen, 'PNG', fc[0] - fw / 2, y, fw, 18, undefined, 'FAST');
+    } catch { /* imagen inválida, continuar sin firma */ }
+  }
 
   fc.forEach((cx, i) => {
     doc.line(cx - fw / 2, y + 18, cx + fw / 2, y + 18);

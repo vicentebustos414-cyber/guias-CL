@@ -26,8 +26,8 @@ router.get('/:token', async (req: Request, res: Response) => {
     try { guia.cargos_extra = JSON.parse(guia.cargos_extra); } catch { guia.cargos_extra = []; }
   }
 
-  // No exponer datos sensibles del usuario propietario
-  const { user_id: _uid, ...safeGuia } = guia;
+  // No exponer datos sensibles (user_id ni el token mismo)
+  const { user_id: _uid, share_token: _tok, ...safeGuia } = guia;
   res.json(safeGuia);
 });
 

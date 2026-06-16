@@ -65,11 +65,15 @@ export async function initDatabase() {
       id INTEGER PRIMARY KEY CHECK (id = 1),
       empresa_emisora TEXT NOT NULL DEFAULT '{}',
       prefijo_guia TEXT NOT NULL DEFAULT 'G',
-      ultimo_numero INTEGER NOT NULL DEFAULT 0
+      ultimo_numero INTEGER NOT NULL DEFAULT 0,
+      firma_imagen TEXT
     );
     INSERT OR IGNORE INTO config (id, empresa_emisora, prefijo_guia, ultimo_numero)
     VALUES (1, '{"nombre":"","rut":"","direccion":"","telefono":"","email":"","giro":""}', 'G', 0);
   `);
+
+  // Migración: añadir firma_imagen si no existe (bases de datos existentes)
+  try { _db.run('ALTER TABLE config ADD COLUMN firma_imagen TEXT'); } catch { /* ya existe */ }
 
   persist();
 }

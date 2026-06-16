@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Guías de Flete Chile — Sistema profesional de guías de transporte</title>
+  <meta name="description" content="Crea, gestiona y comparte guías de flete en segundos. Facturación, reportes y firma digital. Funciona offline como EXE o en la nube." />
+  <meta property="og:title" content="Guías de Flete Chile" />
+  <meta property="og:description" content="Sistema profesional de guías de transporte para Chile" />
+  <meta property="og:type" content="website" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50:'#eff6ff', 100:'#dbeafe', 500:'#3b82f6', 600:'#2563eb', 700:'#1d4ed8', 900:'#1e3a8a' }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    * { font-family: 'Inter', system-ui, sans-serif; }
+    .gradient-hero { background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%); }
+    .card-hover { transition: transform .18s, box-shadow .18s; }
+    .card-hover:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(30,58,138,.13); }
+    html { scroll-behavior: smooth; }
+    .fade-in { animation: fadeIn .5s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+  </style>
+</head>
+<body class="bg-white text-slate-900 antialiased">
+
+<!-- ── NAV ──────────────────────────────────────────────────────────────── -->
+<nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b border-slate-200">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-2.5">
+      <div class="w-8 h-8 gradient-hero rounded-lg flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+      </div>
+      <span class="font-bold text-slate-900 text-[15px]">Guías de Flete Chile</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 text-sm text-slate-600">
+      <a href="#funciones" class="hover:text-blue-700 transition-colors">Funciones</a>
+      <a href="#precios" class="hover:text-blue-700 transition-colors">Precios</a>
+      <a href="#descargar" class="hover:text-blue-700 transition-colors">Descargar</a>
+    </div>
+    <div class="flex items-center gap-2">
+      <a href="/app" class="text-sm text-slate-600 hover:text-blue-700 px-3 py-1.5 transition-colors">Ingresar</a>
+      <a href="#descargar" class="text-sm bg-blue-700 hover:bg-blue-800 text-white px-4 py-1.5 rounded-lg font-medium transition-colors">
+        Descargar gratis
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ─────────────────────────────────────────────────────────────── -->
+<section class="gradient-hero pt-28 pb-20 px-4 text-white text-center">
+  <div class="max-w-3xl mx-auto fade-in">
+    <span class="inline-block bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full mb-5 tracking-wide uppercase">
+      🇨🇱 Hecho para transportistas chilenos
+    </span>
+    <h1 class="text-4xl md:text-5xl font-extrabold leading-tight mb-5">
+      Guías de flete<br/>en segundos, no en horas
+    </h1>
+    <p class="text-blue-100 text-lg md:text-xl mb-9 max-w-xl mx-auto">
+      Crea, numera y comparte guías de transporte con un clic. Sin papel, sin Excel, sin complicaciones.
+    </p>
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+      <a href="#descargar" class="w-full sm:w-auto bg-white text-blue-800 hover:bg-blue-50 px-6 py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+        </svg>
+        Descargar para Windows — gratis
+      </a>
+      <a href="/app" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-colors border border-blue-400">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+        </svg>
+        Usar en la web
+      </a>
+    </div>
+    <p class="text-blue-200 text-xs mt-4">Sin instalación · Sin suscripción obligatoria · 30 guías/mes gratis</p>
+  </div>
+
+  <!-- Mock pantalla -->
+  <div class="max-w-4xl mx-auto mt-14 px-4">
+    <div class="bg-white/10 backdrop-blur border border-white/20 rounded-2xl p-1.5 shadow-2xl">
+      <div class="bg-slate-900 rounded-xl overflow-hidden">
+        <!-- Barra de título falsa -->
+        <div class="bg-slate-800 px-4 py-2.5 flex items-center gap-2">
+          <div class="w-3 h-3 rounded-full bg-red-400"></div>
+          <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+          <div class="w-3 h-3 rounded-full bg-green-400"></div>
+          <span class="ml-3 text-slate-400 text-xs">Guías de Flete Chile</span>
+        </div>
+        <!-- Contenido mock -->
+        <div class="flex bg-slate-900" style="height:260px">
+          <!-- Sidebar -->
+          <div class="w-44 bg-slate-800 p-3 flex flex-col gap-1 shrink-0">
+            <div class="flex items-center gap-2 px-2 py-2 rounded-lg bg-blue-600 text-white text-xs font-medium">
+              <div class="w-3.5 h-3.5 bg-white/30 rounded"></div> Dashboard
+            </div>
+            <div class="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-400 text-xs">
+              <div class="w-3.5 h-3.5 bg-slate-600 rounded"></div> Nueva Guía
+            </div>
+            <div class="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-400 text-xs">
+              <div class="w-3.5 h-3.5 bg-slate-600 rounded"></div> Historial
+            </div>
+            <div class="flex items-center gap-2 px-2 py-2 rounded-lg text-slate-400 text-xs">
+              <div class="w-3.5 h-3.5 bg-slate-600 rounded"></div> Reportes
+            </div>
+            <div class="mt-auto flex items-center gap-2 px-2 py-2 rounded-lg text-slate-400 text-xs">
+              <div class="w-3.5 h-3.5 bg-slate-600 rounded"></div> Configuración
+            </div>
+          </div>
+          <!-- Main content mock -->
+          <div class="flex-1 p-4 overflow-hidden">
+            <div class="grid grid-cols-3 gap-3 mb-4">
+              <div class="bg-blue-600/20 border border-blue-500/30 rounded-lg p-3">
+                <p class="text-blue-300 text-xs">Guías este mes</p>
+                <p class="text-white font-bold text-xl mt-1">24</p>
+              </div>
+              <div class="bg-emerald-600/20 border border-emerald-500/30 rounded-lg p-3">
+                <p class="text-emerald-300 text-xs">Total facturado</p>
+                <p class="text-white font-bold text-xl mt-1">$4.8M</p>
+              </div>
+              <div class="bg-amber-600/20 border border-amber-500/30 rounded-lg p-3">
+                <p class="text-amber-300 text-xs">Pendientes</p>
+                <p class="text-white font-bold text-xl mt-1">7</p>
+              </div>
+            </div>
+            <div class="bg-slate-800 rounded-lg overflow-hidden">
+              <div class="grid grid-cols-4 bg-slate-700 px-3 py-1.5 text-slate-300" style="font-size:10px">
+                <span>N° Guía</span><span>Empresa</span><span>Tramo</span><span class="text-right">Total</span>
+              </div>
+              <div class="divide-y divide-slate-700">
+                <div class="grid grid-cols-4 px-3 py-2 text-slate-300" style="font-size:10px">
+                  <span class="text-blue-400 font-mono">G000024</span><span>Import. XYZ</span><span>Stgo → Valpo</span><span class="text-right text-emerald-400">$285.000</span>
+                </div>
+                <div class="grid grid-cols-4 px-3 py-2 text-slate-300" style="font-size:10px">
+                  <span class="text-blue-400 font-mono">G000023</span><span>Trans. Sur SA</span><span>Stgo → BíoBío</span><span class="text-right text-emerald-400">$420.000</span>
+                </div>
+                <div class="grid grid-cols-4 px-3 py-2 text-slate-300" style="font-size:10px">
+                  <span class="text-blue-400 font-mono">G000022</span><span>Log. Norte</span><span>Stgo → Antof.</span><span class="text-right text-amber-400">$590.000</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── LOGOS CONFIANZA ──────────────────────────────────────────────────── -->
+<section class="bg-slate-50 border-b border-slate-200 py-8 px-4">
+  <div class="max-w-4xl mx-auto text-center">
+    <p class="text-slate-400 text-xs font-semibold uppercase tracking-widest mb-6">Compatible con</p>
+    <div class="flex flex-wrap justify-center gap-8 text-slate-400 text-sm font-medium">
+      <span>🇨🇱 RUT chileno validado</span>
+      <span>📋 Formato guía SII-compatible</span>
+      <span>💳 Flow Chile pagos</span>
+      <span>📱 Android APK</span>
+      <span>🖥 Windows portable</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── FUNCIONES ───────────────────────────────────────────────────────── -->
+<section id="funciones" class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14">
+      <h2 class="text-3xl font-extrabold text-slate-900 mb-3">Todo lo que necesitas</h2>
+      <p class="text-slate-500 max-w-xl mx-auto">Diseñado específicamente para el negocio del flete en Chile, sin funciones de más.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <div class="card-hover bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-blue-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">Guías en segundos</h3>
+        <p class="text-slate-500 text-sm">Numeración automática, campos inteligentes con historial y exportación PDF profesional con tu logo y firma.</p>
+      </div>
+
+      <div class="card-hover bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">Facturas y Notas de Crédito</h3>
+        <p class="text-slate-500 text-sm">Genera facturas con IVA 19%, neto y total. Agrupa múltiples guías en una sola factura para el cliente.</p>
+      </div>
+
+      <div class="card-hover bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-emerald-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">Compartir por WhatsApp</h3>
+        <p class="text-slate-500 text-sm">Envía un link único al receptor para que vea e imprima su copia sin necesidad de instalar nada.</p>
+      </div>
+
+      <div class="card-hover bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-purple-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">Reportes y estadísticas</h3>
+        <p class="text-slate-500 text-sm">Gráficos por mes, top clientes, exportación Excel. Sabe exactamente cuánto estás facturando.</p>
+      </div>
+
+      <div class="card-hover bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">OCR — importar desde foto</h3>
+        <p class="text-slate-500 text-sm">Saca foto a una guía en papel y el sistema extrae los datos automáticamente con reconocimiento de texto.</p>
+      </div>
+
+      <div class="card-hover bg-white border border-slate-200 rounded-2xl p-6">
+        <div class="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center mb-4">
+          <svg class="w-5 h-5 text-slate-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-2">Funciona sin internet</h3>
+        <p class="text-slate-500 text-sm">El EXE para Windows guarda todo localmente. Trabaja en terreno sin conexión y sincroniza cuando vuelvas.</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── PLATAFORMAS ─────────────────────────────────────────────────────── -->
+<section class="bg-slate-50 py-16 px-4 border-y border-slate-200">
+  <div class="max-w-5xl mx-auto">
+    <h2 class="text-2xl font-extrabold text-center text-slate-900 mb-10">Disponible en todas tus plataformas</h2>
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 text-center card-hover">
+        <div class="w-14 h-14 bg-blue-700 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-1">Windows EXE</h3>
+        <p class="text-slate-500 text-sm mb-4">Portable, sin instalación. Abre y listo. Base de datos local, cero dependencias.</p>
+        <a href="#descargar" class="inline-block bg-blue-700 hover:bg-blue-800 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
+          Descargar .exe
+        </a>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 text-center card-hover">
+        <div class="w-14 h-14 bg-slate-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-1">Web (Render)</h3>
+        <p class="text-slate-500 text-sm mb-4">Accede desde cualquier navegador. Datos en la nube, multi-dispositivo.</p>
+        <a href="/app" class="inline-block bg-slate-800 hover:bg-slate-900 text-white text-sm font-medium px-5 py-2 rounded-lg transition-colors">
+          Abrir app web
+        </a>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-slate-200 p-6 text-center card-hover">
+        <div class="w-14 h-14 bg-emerald-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M17.6 9.48l1.84-3.18c.16-.31.04-.69-.26-.85a.643.643 0 00-.83.22l-1.88 3.24a11.463 11.463 0 00-4.17-.77c-1.55 0-3 .28-4.17.77L6.25 5.67a.643.643 0 00-.83-.22c-.3.16-.42.54-.26.85L7 9.48C4.25 11.13 2.5 13.93 2.5 17h19c0-3.07-1.75-5.87-3.9-7.52zM7 15.25c-.69 0-1.25-.56-1.25-1.25S6.31 12.75 7 12.75s1.25.56 1.25 1.25S7.69 15.25 7 15.25zm10 0c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z"/></svg>
+        </div>
+        <h3 class="font-bold text-slate-900 mb-1">Android APK</h3>
+        <p class="text-slate-500 text-sm mb-4">Instala el APK directo en tu celular. Ideal para uso en terreno desde el móvil.</p>
+        <span class="inline-block bg-slate-100 text-slate-500 text-sm font-medium px-5 py-2 rounded-lg">
+          Próximamente
+        </span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── PRECIOS ──────────────────────────────────────────────────────────── -->
+<section id="precios" class="py-20 px-4">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-14">
+      <h2 class="text-3xl font-extrabold text-slate-900 mb-3">Precios simples y justos</h2>
+      <p class="text-slate-500">Sin contratos, sin permanencia. Paga solo cuando necesites más.</p>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-6">
+
+      <!-- Gratis -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-7 card-hover">
+        <p class="text-sm font-semibold text-slate-500 mb-2">GRATUITO</p>
+        <p class="text-4xl font-extrabold text-slate-900 mb-1">$0</p>
+        <p class="text-slate-400 text-sm mb-6">Para siempre</p>
+        <ul class="space-y-3 mb-8 text-sm text-slate-600">
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> 30 guías por mes</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> PDF profesional</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Historial completo</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> EXE Windows offline</li>
+          <li class="flex items-center gap-2"><span class="text-slate-300 font-bold">✗</span> Reportes avanzados</li>
+          <li class="flex items-center gap-2"><span class="text-slate-300 font-bold">✗</span> WhatsApp portal</li>
+        </ul>
+        <a href="#descargar" class="block text-center border border-slate-300 hover:border-blue-400 text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+          Empezar gratis
+        </a>
+      </div>
+
+      <!-- Pro -->
+      <div class="bg-blue-700 border border-blue-600 rounded-2xl p-7 card-hover relative">
+        <div class="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span class="bg-amber-400 text-amber-900 text-xs font-bold px-3 py-1 rounded-full">MÁS POPULAR</span>
+        </div>
+        <p class="text-sm font-semibold text-blue-200 mb-2">PRO</p>
+        <p class="text-4xl font-extrabold text-white mb-1">$9.990</p>
+        <p class="text-blue-200 text-sm mb-6">CLP por mes</p>
+        <ul class="space-y-3 mb-8 text-sm text-blue-100">
+          <li class="flex items-center gap-2"><span class="text-emerald-300 font-bold">✓</span> <strong class="text-white">Guías ilimitadas</strong></li>
+          <li class="flex items-center gap-2"><span class="text-emerald-300 font-bold">✓</span> PDF profesional</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-300 font-bold">✓</span> Reportes avanzados</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-300 font-bold">✓</span> Portal receptor WhatsApp</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-300 font-bold">✓</span> Facturas y N/C</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-300 font-bold">✓</span> Exportar Excel</li>
+        </ul>
+        <a href="/app" class="block text-center bg-white text-blue-700 hover:bg-blue-50 px-4 py-2.5 rounded-xl text-sm font-bold transition-colors">
+          Suscribirse — $9.990/mes
+        </a>
+      </div>
+
+      <!-- Business -->
+      <div class="bg-white border border-slate-200 rounded-2xl p-7 card-hover">
+        <p class="text-sm font-semibold text-slate-500 mb-2">BUSINESS</p>
+        <p class="text-4xl font-extrabold text-slate-900 mb-1">$24.990</p>
+        <p class="text-slate-400 text-sm mb-6">CLP por mes</p>
+        <ul class="space-y-3 mb-8 text-sm text-slate-600">
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Todo lo de Pro</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Múltiples usuarios</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Firma digital PKI</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> API acceso</li>
+          <li class="flex items-center gap-2"><span class="text-emerald-500 font-bold">✓</span> Soporte prioritario</li>
+        </ul>
+        <a href="/app" class="block text-center border border-slate-300 hover:border-blue-400 text-slate-700 hover:text-blue-700 px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors">
+          Suscribirse — $24.990/mes
+        </a>
+      </div>
+    </div>
+
+    <p class="text-center text-slate-400 text-xs mt-6">Pagos seguros vía <strong>Flow Chile</strong> · Cancela cuando quieras</p>
+  </div>
+</section>
+
+<!-- ── DESCARGAR ────────────────────────────────────────────────────────── -->
+<section id="descargar" class="gradient-hero py-16 px-4 text-white text-center">
+  <div class="max-w-2xl mx-auto">
+    <h2 class="text-3xl font-extrabold mb-3">Listo para empezar</h2>
+    <p class="text-blue-100 mb-8">Descarga el EXE portable o usa la versión web. Sin registros ni tarjetas para el plan gratuito.</p>
+    <div class="flex flex-col sm:flex-row gap-3 justify-center">
+      <a
+        href="/GuiasFleteChile-1.0.0.exe"
+        download
+        class="bg-white text-blue-800 hover:bg-blue-50 px-7 py-3.5 rounded-xl font-bold flex items-center justify-center gap-2.5 transition-colors shadow-lg"
+      >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Descargar para Windows
+        <span class="text-blue-400 text-xs font-normal">~130 MB</span>
+      </a>
+      <a href="/app" class="border border-white/40 hover:bg-white/10 text-white px-7 py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/></svg>
+        Usar en el navegador
+      </a>
+    </div>
+    <p class="text-blue-200 text-xs mt-5">Windows 10 / 11 · 64 bits · Portable (sin instalación)</p>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────────────────────── -->
+<footer class="bg-slate-900 text-slate-400 py-10 px-4 text-sm">
+  <div class="max-w-5xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+    <div class="flex items-center gap-2.5">
+      <div class="w-7 h-7 gradient-hero rounded-lg flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+      </div>
+      <span class="text-white font-semibold">Guías de Flete Chile</span>
+    </div>
+    <div class="flex gap-5 text-xs">
+      <a href="#funciones" class="hover:text-white transition-colors">Funciones</a>
+      <a href="#precios" class="hover:text-white transition-colors">Precios</a>
+      <a href="mailto:soporte@guiasflete.cl" class="hover:text-white transition-colors">Soporte</a>
+    </div>
+    <p class="text-xs text-slate-500">© 2025 Guías de Flete Chile. Hecho en 🇨🇱</p>
+  </div>
+</footer>
+
+</body>
+</html>

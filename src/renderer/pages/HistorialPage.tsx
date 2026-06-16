@@ -473,7 +473,7 @@ export default function HistorialPage({ onNavigate }: Props) {
     const config   = await api.config.get();
     const filePath = await api.guias.exportPath(g.numero_guia);
     if (!filePath) return;
-    const pdfBytes = await generatePDF(g, config.empresa_emisora);
+    const pdfBytes = await generatePDF(g, config.empresa_emisora, config.firma_imagen);
     await api.guias.savePdf(Array.from(pdfBytes), filePath);
   }
 
